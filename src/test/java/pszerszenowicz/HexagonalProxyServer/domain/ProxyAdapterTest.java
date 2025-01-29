@@ -9,7 +9,7 @@ import static org.mockito.Mockito.*;
 public class ProxyAdapterTest {
 
     @Test
-    public void sendMessageToClientTest() throws NoSuchMethodException {
+    public void sendMessageToClientTest(){
         //given
         ClientRepository clientRepository = mock(ClientRepository.class);
         ProxyAdapter proxyAdapter = new ProxyAdapter();
