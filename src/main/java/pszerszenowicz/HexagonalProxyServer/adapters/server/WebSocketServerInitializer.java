@@ -13,14 +13,14 @@ import java.util.Set;
 
 class WebSocketServerInitializer extends ChannelInitializer<SocketChannel> {
 
-    private Set<ServerNewConnectionObservator> newConnectionObservators = new HashSet<>();
+    private Set<ServerNewConnectionObservator> newConnectionObservators;
 
     public WebSocketServerInitializer(Set<ServerNewConnectionObservator> newConnectionObservators) {
         this.newConnectionObservators = newConnectionObservators;
     }
 
     @Override
-    public void initChannel(SocketChannel ch) throws Exception {
+    public void initChannel(SocketChannel ch){
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast(new HttpServerCodec());
         pipeline.addLast(new HttpObjectAggregator(65536));

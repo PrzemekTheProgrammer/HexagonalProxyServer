@@ -15,7 +15,7 @@ import java.util.Set;
 public class WebSocketServer implements ServerRepository {
 
     private Channel serverChannel;
-    private Set<ServerNewConnectionObservator> newConnectionObservators = new HashSet<>();
+    private Set<ServerNewConnectionObservator> newConnectionObservators;
 
     public WebSocketServer(Set<ServerNewConnectionObservator> newConnectionObservators) {
         this.newConnectionObservators = newConnectionObservators;

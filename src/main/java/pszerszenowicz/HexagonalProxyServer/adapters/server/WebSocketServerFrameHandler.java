@@ -15,19 +15,19 @@ import java.util.Set;
 public class WebSocketServerFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame>
         implements ServerNewConnectionEventHandler {
 
-    private Set<ServerNewConnectionObservator> newConnectionObservators = new HashSet<>();
+    private Set<ServerNewConnectionObservator> newConnectionObservators;
 
     public WebSocketServerFrameHandler(Set<ServerNewConnectionObservator> newConnectionObservators) {
         this.newConnectionObservators = newConnectionObservators;
     }
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+    public void channelActive(ChannelHandlerContext ctx) {
         notifyNewConnection(new ServerChannelImpl(ctx.channel()));
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (frame instanceof TextWebSocketFrame) {
             String request = ((TextWebSocketFrame) frame).text();
             System.out.println("Server got request: \n" + request + "\n");
@@ -49,8 +49,6 @@ public class WebSocketServerFrameHandler extends SimpleChannelInboundHandler<Web
 
     @Override
     public void notifyNewConnection(ServerChannel serverChannel) {
-        newConnectionObservators.forEach((o) -> {
-            o.handleNewConnection(serverChannel);
-        });
+        newConnectionObservators.forEach((o) -> o.handleNewConnection(serverChannel));
     }
 }
