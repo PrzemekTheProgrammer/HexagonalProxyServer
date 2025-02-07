@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 public class ServerServiceTest {
 
     @Test
-    public void testServerisRunning() {
+    public void testServerIsRunning() {
         //given
         ServerRepository serverRepository = new WebSocketServer(null);
         ServerService serverService = new ServerService(serverRepository);

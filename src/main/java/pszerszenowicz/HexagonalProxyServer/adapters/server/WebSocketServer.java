@@ -7,18 +7,17 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import pszerszenowicz.HexagonalProxyServer.domain.ports.ServerRepository;
-import pszerszenowicz.HexagonalProxyServer.domain.server.ServerNewConnectionObservator;
+import pszerszenowicz.HexagonalProxyServer.domain.NewMessageSubscriber;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class WebSocketServer implements ServerRepository {
 
     private Channel serverChannel;
-    private Set<ServerNewConnectionObservator> newConnectionObservators;
+    private Set<NewMessageSubscriber> newMessageSubscribers;
 
-    public WebSocketServer(Set<ServerNewConnectionObservator> newConnectionObservators) {
-        this.newConnectionObservators = newConnectionObservators;
+    public WebSocketServer(Set<NewMessageSubscriber> newMessageSubscribers) {
+        this.newMessageSubscribers = newMessageSubscribers;
     }
 
     @Override
@@ -29,7 +28,7 @@ public class WebSocketServer implements ServerRepository {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new WebSocketServerInitializer(newConnectionObservators));
+                    .childHandler(new WebSocketServerInitializer(newMessageSubscribers));
             ChannelFuture f = b.bind(port).sync();
             serverChannel = f.channel();
             serverChannel.closeFuture().sync();

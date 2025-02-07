@@ -4,32 +4,34 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import pszerszenowicz.HexagonalProxyServer.domain.ServerChannel;
-import pszerszenowicz.HexagonalProxyServer.domain.server.ServerNewConnectionEventHandler;
-import pszerszenowicz.HexagonalProxyServer.domain.server.ServerNewConnectionObservator;
+import pszerszenowicz.HexagonalProxyServer.domain.Message;
+import pszerszenowicz.HexagonalProxyServer.domain.MessageType;
+import pszerszenowicz.HexagonalProxyServer.domain.NewMessagePublisher;
+import pszerszenowicz.HexagonalProxyServer.domain.NewMessageSubscriber;
 
 import java.net.SocketException;
-import java.util.HashSet;
 import java.util.Set;
 
-public class WebSocketServerFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame>
-        implements ServerNewConnectionEventHandler {
+class WebSocketServerFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame>
+        implements NewMessagePublisher {
 
-    private Set<ServerNewConnectionObservator> newConnectionObservators;
+    private Set<NewMessageSubscriber> newMessageSubscribers;
 
-    public WebSocketServerFrameHandler(Set<ServerNewConnectionObservator> newConnectionObservators) {
-        this.newConnectionObservators = newConnectionObservators;
-    }
-
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) {
-        notifyNewConnection(new ServerChannelImpl(ctx.channel()));
+    public WebSocketServerFrameHandler(Set<NewMessageSubscriber> newMessageSubscribers) {
+        this.newMessageSubscribers = newMessageSubscribers;
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame) {
         if (frame instanceof TextWebSocketFrame) {
             String request = ((TextWebSocketFrame) frame).text();
+            if(request.toLowerCase().startsWith("connect")) {
+                notifyNewMessage(new Message(
+                        request,
+                        ctx.channel(),
+                        MessageType.NEW_CONNECTION
+                ));
+            }
             System.out.println("Server got request: \n" + request + "\n");
         } else {
             String message = "unsupported frame type: " + frame.getClass().getName();
@@ -48,7 +50,7 @@ public class WebSocketServerFrameHandler extends SimpleChannelInboundHandler<Web
     }
 
     @Override
-    public void notifyNewConnection(ServerChannel serverChannel) {
-        newConnectionObservators.forEach((o) -> o.handleNewConnection(serverChannel));
+    public void notifyNewMessage(Message message) {
+        newMessageSubscribers.forEach((o) -> o.handleNewMessage(message));
     }
 }
