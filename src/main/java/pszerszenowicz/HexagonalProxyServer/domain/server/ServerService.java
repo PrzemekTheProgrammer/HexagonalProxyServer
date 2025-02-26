@@ -11,7 +11,11 @@ public class ServerService {
     }
 
     public void start(int port){
-        serverRepository.start(port);
+        try {
+            serverRepository.start(port);
+        } catch (InterruptedException e) {
+            System.err.println("Server didn't start");
+        }
     }
 
     public boolean isRunning(){
